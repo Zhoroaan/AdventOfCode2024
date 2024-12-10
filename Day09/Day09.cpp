@@ -3,8 +3,8 @@
 #include <print>
 #include <string>
 #include <vector>
-//std::string Filename = "TestInput.txt";
-std::string Filename = "Input.txt";
+std::string Filename = "TestInput.txt";
+//std::string Filename = "Input.txt";
 
 static int64_t GetNumberFromChar(char InChar)
 {
@@ -13,6 +13,8 @@ static int64_t GetNumberFromChar(char InChar)
 
 static void Part1Compact(std::vector<int64_t>& InOutPart1Numbers)
 {
+    auto start = std::chrono::high_resolution_clock::now();
+    int lastMovededAwayIndex = std::numeric_limits<int>::max();
     for (int index = static_cast<int>(InOutPart1Numbers.size()) -1; index >= 0; --index)
     {
         if (InOutPart1Numbers[index] == -1)
@@ -24,9 +26,12 @@ static void Part1Compact(std::vector<int64_t>& InOutPart1Numbers)
             {
                 InOutPart1Numbers[start] = InOutPart1Numbers[index];
                 InOutPart1Numbers[index] = -1;
+                break;
             }
         }
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::println("Execution time: {0}ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 }
 
 static int FindNumberOfFree(const std::vector<int64_t>& InOutPart2Numbers, int InIndex)
@@ -43,6 +48,7 @@ static int FindNumberOfFree(const std::vector<int64_t>& InOutPart2Numbers, int I
 
 static void Part2Compact(std::vector<int64_t>& InOutPart2Numbers)
 {
+    auto start = std::chrono::high_resolution_clock::now();
     for (int index = static_cast<int>(InOutPart2Numbers.size()) -1; index >= 0; --index)
     {
         if (InOutPart2Numbers[index] == -1)
@@ -58,13 +64,15 @@ static void Part2Compact(std::vector<int64_t>& InOutPart2Numbers)
 
             for (int freeSearch = start + 1; freeSearch < index; ++freeSearch)
             {
-                if (InOutPart2Numbers[freeSearch] != -1)
+                if (InOutPart2Numbers[freeSearch] != -1 || freeCount >= count)
                     break;
                 freeCount++;
             }
 
             if (freeCount < count)
+            {
                 continue;
+            }
             
             const int64_t moveValue = InOutPart2Numbers[index];
             for (int copy = 0; copy < count; ++copy)
@@ -76,15 +84,17 @@ static void Part2Compact(std::vector<int64_t>& InOutPart2Numbers)
         }
         index -= count - 1;
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::println("Execution time: {0}ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 }
 
 int main(int /*argc*/, char* /*argv*/[])
 {
+    auto start = std::chrono::high_resolution_clock::now();
     std::ifstream inputFile;
     inputFile.open(Filename);
     std::string inputLine;
     std::getline(inputFile, inputLine);
-    auto start = std::chrono::high_resolution_clock::now();
     std::vector<int64_t> part1Numbers;
     for (int index = 0; index < inputLine.size(); ++index)
     {
@@ -107,9 +117,10 @@ int main(int /*argc*/, char* /*argv*/[])
             part2Sum += part2Numbers[index] * index;
     }
     auto end = std::chrono::high_resolution_clock::now();
+    std::println("Execution time: {0}ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+    
     std::println("Day 9 part 1: {}", part1Sum);
     std::println("Day 9 part 2: {}", part2Sum);
-    std::println("Execution time: {0}ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
     
     return 0;
 }
